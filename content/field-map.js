@@ -13,7 +13,6 @@
       "lastname",
       "surname",
       "family name",
-      "family-name",
       "lname",
       "last"
     ],
@@ -45,6 +44,7 @@
     ],
     company: [
       "company",
+      "company name",
       "current company",
       "employer",
       "current employer",
@@ -78,8 +78,8 @@
       "years of experience",
       "years experience",
       "experience years",
-      "total experience",
-      "professional experience"
+      "total years experience",
+      "total experience"
     ],
     authorizedToWork: [
       "authorized to work",
@@ -118,9 +118,17 @@
     requiresSponsorship: "Requires sponsorship"
   };
 
-  const FIELD_ORDER = Object.keys(FIELD_MAP);
+  const FIELD_ORDER =
+    Object.keys(
+      FIELD_MAP
+    );
 
-  globalThis.__B1O_FIELD_MAP__ = Object.freeze(FIELD_MAP);
-  globalThis.__B1O_FIELD_LABELS__ = Object.freeze(FIELD_LABELS);
-  globalThis.__B1O_FIELD_ORDER__ = Object.freeze(FIELD_ORDER);
+  globalThis.__B1O_FIELD_MAP__ =
+    Object.freeze(FIELD_MAP);
+
+  globalThis.__B1O_FIELD_LABELS__ =
+    Object.freeze(FIELD_LABELS);
+
+  globalThis.__B1O_FIELD_ORDER__ =
+    Object.freeze(FIELD_ORDER);
 })();
