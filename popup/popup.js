@@ -1,13 +1,14 @@
 const STORAGE_KEY = "profile";
 
-const AI_ENDPOINT =
-  "https://your-project.vercel.app/api/generate";
+const DEPLOYED_VERCEL_URL = "";
+const LOCAL_AI_ENDPOINT =
+  "http://localhost:3000/api/generate";
 
 const CONTENT_SCRIPT_FILES = [
   "content/field-map.js",
   "content/field-finder.js",
   "content/field-setter.js",
-  "content/platform-detector.js",
+  "content/form-filler.js",
   "content/content.js"
 ];
 
@@ -42,6 +43,21 @@ const APPLICATION_FIELDS = [
   "requiresSponsorship"
 ];
 
+const FIELD_LABELS = {
+  firstName: "First Name",
+  lastName: "Last Name",
+  email: "Email",
+  phone: "Phone",
+  location: "Location",
+  company: "Company",
+  linkedin: "LinkedIn",
+  github: "GitHub",
+  portfolio: "Portfolio",
+  yearsOfExperience: "Years of Experience",
+  authorizedToWork: "Authorized to Work",
+  requiresSponsorship: "Requires Sponsorship"
+};
+
 const FIELD_IDS = Object.keys(DEFAULT_PROFILE);
 
 const $ = (id) =>
@@ -73,9 +89,7 @@ async function loadProfile() {
     ...(result[STORAGE_KEY] || {})
   };
 
-  for (
-    const id of FIELD_IDS
-  ) {
+  for (const id of FIELD_IDS) {
     const field = $(id);
 
     if (field) {
@@ -88,9 +102,7 @@ async function loadProfile() {
 function readProfileFromForm() {
   const profile = {};
 
-  for (
-    const id of FIELD_IDS
-  ) {
+  for (const id of FIELD_IDS) {
     const field = $(id);
 
     profile[id] = field
@@ -134,13 +146,6 @@ async function ensureContentScripts(
 
     return;
   } catch {
-    /*
-     * When an extension is reloaded while a page
-     * is already open, declarative content scripts
-     * may not be present until the page reloads.
-     *
-     * Inject the full stack as a fallback.
-     */
     await chrome.scripting.executeScript({
       target: {
         tabId,
@@ -154,29 +159,34 @@ async function ensureContentScripts(
 function mergeFillReports(
   reports
 ) {
-  const fields = new Map();
+  const reportByKey = new Map();
+
+  for (const key of APPLICATION_FIELDS) {
+    reportByKey.set(
+      key,
+      {
+        key,
+        label:
+          FIELD_LABELS[key],
+        filled: false,
+        found: false
+      }
+    );
+  }
 
   for (const report of reports) {
     if (
       !report ||
-      !Array.isArray(
-        report.fields
-      )
+      !Array.isArray(report.fields)
     ) {
       continue;
     }
 
     for (const field of report.fields) {
       const existing =
-        fields.get(field.key);
+        reportByKey.get(field.key);
 
       if (!existing) {
-        fields.set(
-          field.key,
-          {
-            ...field
-          }
-        );
         continue;
       }
 
@@ -194,34 +204,35 @@ function mergeFillReports(
     }
   }
 
-  const ordered =
+  const fields =
     APPLICATION_FIELDS.map(
-      (key) => fields.get(key)
-    ).filter(Boolean);
+      (key) =>
+        reportByKey.get(key)
+    );
 
   const filled =
-    ordered.filter(
-      (field) => field.filled
+    fields.filter(
+      (field) =>
+        field.filled
     ).length;
 
-  const total =
-    ordered.length || APPLICATION_FIELDS.length;
+  const platform =
+    reports.find(
+      (report) =>
+        report?.platform &&
+        report.platform !== "Unknown"
+    )?.platform ||
+    reports.find(
+      (report) =>
+        report?.platform
+    )?.platform ||
+    "Unknown";
 
   return {
-    platform:
-      reports.find(
-        (report) =>
-          report?.platform &&
-          report.platform !== "Unknown"
-      )?.platform ||
-      reports.find(
-        (report) =>
-          report?.platform
-      )?.platform ||
-      "Unknown",
-    fields: ordered,
+    platform,
+    fields,
     filled,
-    total
+    total: APPLICATION_FIELDS.length
   };
 }
 
@@ -245,7 +256,8 @@ function renderFillReport(
     "Filled " +
     report.filled +
     " / " +
-    report.total;
+    report.total +
+    " fields";
 
   $("platform").textContent =
     "Platform: " +
@@ -262,9 +274,11 @@ function renderFillReport(
 
     row.className =
       "report-row " +
-      (field.filled
-        ? "ok"
-        : "fail");
+      (
+        field.filled
+          ? "ok"
+          : "fail"
+      );
 
     const icon =
       document.createElement(
@@ -299,22 +313,20 @@ function renderFillReport(
       row
     );
 
-    if (
-      !field.filled
-    ) {
-      const chip =
+    if (!field.filled) {
+      const item =
         document.createElement(
           "span"
         );
 
-      chip.className =
+      item.className =
         "unfilled-chip";
 
-      chip.textContent =
+      item.textContent =
         field.label;
 
       unfilledList.appendChild(
-        chip
+        item
       );
     }
   }
@@ -322,19 +334,19 @@ function renderFillReport(
   if (
     !unfilledList.children.length
   ) {
-    const chip =
+    const item =
       document.createElement(
         "span"
       );
 
-    chip.className =
+    item.className =
       "unfilled-chip";
 
-    chip.textContent =
-      "Nothing obvious left";
-      
+    item.textContent =
+      "None";
+
     unfilledList.appendChild(
-      chip
+      item
     );
   }
 }
@@ -354,12 +366,11 @@ async function fillCurrentTab() {
     const profile =
       await saveProfile(false);
 
-    const [
-      tab
-    ] = await chrome.tabs.query({
-      active: true,
-      currentWindow: true
-    });
+    const [tab] =
+      await chrome.tabs.query({
+        active: true,
+        currentWindow: true
+      });
 
     if (!tab?.id) {
       throw new Error(
@@ -459,31 +470,35 @@ async function getJobDescription(
   );
 }
 
+function getAiEndpoint() {
+  const deployed =
+    DEPLOYED_VERCEL_URL
+      .trim()
+      .replace(/\/+$/, "");
+
+  if (deployed) {
+    return (
+      deployed +
+      "/api/generate"
+    );
+  }
+
+  return LOCAL_AI_ENDPOINT;
+}
+
 async function generateCoverLetter() {
   const button =
     $("coverLetterButton");
 
-  button.disabled = true;
+  button.disabled =
+    true;
 
   try {
-    if (
-      AI_ENDPOINT.includes(
-        "your-project.vercel.app"
-      )
-    ) {
-      setStatus(
-        "AI endpoint not connected yet."
-      );
-
-      return;
-    }
-
-    const [
-      tab
-    ] = await chrome.tabs.query({
-      active: true,
-      currentWindow: true
-    });
+    const [tab] =
+      await chrome.tabs.query({
+        active: true,
+        currentWindow: true
+      });
 
     if (!tab?.id) {
       throw new Error(
@@ -505,18 +520,19 @@ async function generateCoverLetter() {
 
     const response =
       await fetch(
-        AI_ENDPOINT,
+        getAiEndpoint(),
         {
           method: "POST",
           headers: {
             "Content-Type":
               "application/json"
           },
-          body: JSON.stringify({
-            question,
-            jobDescription,
-            profile
-          })
+          body:
+            JSON.stringify({
+              question,
+              jobDescription,
+              profile
+            })
         }
       );
 
@@ -539,12 +555,10 @@ async function generateCoverLetter() {
     $("coverLetterTemplate").value =
       data.answer;
 
-    await saveProfile(
-      false
-    );
+    await saveProfile(false);
 
     setStatus(
-      "AI draft inserted into the template.",
+      "Cover letter generated.",
       "success"
     );
   } catch (error) {
@@ -553,8 +567,13 @@ async function generateCoverLetter() {
       error
     );
 
+    const message =
+      DEPLOYED_VERCEL_URL.trim()
+        ? "AI request failed — check the Vercel endpoint."
+        : "AI endpoint not deployed yet — see README";
+
     setStatus(
-      "AI endpoint not connected yet.",
+      message,
       "error"
     );
   } finally {
