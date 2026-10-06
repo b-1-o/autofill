@@ -1,21 +1,37 @@
 {
   "manifest_version": 3,
-  "name": "b1o Autofill",
-  "version": "0.2.0",
-  "description": "Fast, review-first autofill for job applications.",
-  "permissions": ["storage", "activeTab", "downloads"],
-  "host_permissions": ["https://*/*", "http://*/*"],
+  "name": "Autofill — Job Applications",
+  "version": "0.3.0",
+  "description": "Review-first form autofill for job applications.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": [
+    "https://*.linkedin.com/*",
+    "https://*.jobright.ai/*",
+    "https://*.greenhouse.io/*",
+    "https://*.lever.co/*",
+    "https://*.myworkdayjobs.com/*",
+    "https://*.ashbyhq.com/*"
+  ],
   "action": {
-    "default_title": "b1o Autofill",
+    "default_title": "Autofill",
     "default_popup": "popup/popup.html"
   },
   "background": {
     "service_worker": "background/service-worker.js"
   },
-  "content_scripts": [{
-    "matches": ["https://*/*", "http://*/*"],
-    "js": ["content/content.js"],
-    "run_at": "document_idle",
-    "all_frames": true
-  }]
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.linkedin.com/*",
+        "https://*.jobright.ai/*",
+        "https://*.greenhouse.io/*",
+        "https://*.lever.co/*",
+        "https://*.myworkdayjobs.com/*",
+        "https://*.ashbyhq.com/*"
+      ],
+      "js": ["content/content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
 }
