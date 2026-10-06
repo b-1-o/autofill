@@ -6,14 +6,15 @@
 * { box-sizing: border-box; }
 
 body {
-  width: 390px;
-  min-height: 560px;
+  width: 430px;
+  min-height: 620px;
+  max-height: 760px;
   margin: 0;
   background: #08090b;
   color: #f5f5f5;
 }
 
-button, input { font: inherit; }
+button, input, textarea { font: inherit; }
 
 button {
   border: 0;
@@ -22,13 +23,14 @@ button {
 
 .app {
   padding: 18px;
+  overflow-y: auto;
 }
 
 .header,
 .section-heading,
 .doc-row,
-.toggle-card,
 .actions,
+.eeo-heading,
 footer {
   display: flex;
   align-items: center;
@@ -64,7 +66,6 @@ h1 {
 .hero-card,
 .result-card,
 .documents,
-.toggle-card,
 .profile {
   border: 1px solid rgba(255,255,255,.09);
   background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
@@ -87,16 +88,16 @@ h1 {
   font-size: 12px;
 }
 
+#pageHint {
+  margin-top: 10px;
+}
+
 .muted {
   color: #82838d;
   font-size: 11px;
 }
 
 .small { font-size: 10px; }
-
-#pageHint {
-  margin-top: 10px;
-}
 
 .actions {
   gap: 8px;
@@ -140,8 +141,7 @@ h1 {
 }
 
 .documents,
-.profile,
-.toggle-card {
+.profile {
   padding: 12px;
   margin-bottom: 12px;
 }
@@ -176,14 +176,72 @@ h1 {
   font-size: 10px;
 }
 
-.toggle-card {
-  gap: 12px;
+.subheading {
+  margin: 13px 0 8px;
+  color: #c5c5cd;
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
 }
 
-.toggle-card strong {
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #999aa3;
+  font-size: 9px;
+}
+
+.grid label.full {
+  grid-column: 1 / -1;
+}
+
+.grid input,
+.grid textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 9px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: #111216;
+  color: #efeff2;
+  outline: none;
+  font-size: 10px;
+  resize: vertical;
+}
+
+.grid input:focus,
+.grid textarea:focus {
+  border-color: rgba(255,255,255,.2);
+}
+
+.text-btn {
+  background: transparent;
+  color: #cfcfd6;
+  font-size: 10px;
+}
+
+.eeo-heading {
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.sensitive-section {
+  display: none;
+}
+
+.sensitive-section.open {
   display: block;
-  margin-bottom: 3px;
-  font-size: 11px;
+}
+
+.sensitive-section > .muted {
+  margin-bottom: 8px;
 }
 
 .switch input {
@@ -219,46 +277,6 @@ h1 {
 .switch input:checked + span::after {
   transform: translateX(16px);
   background: #111216;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.grid label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  color: #999aa3;
-  font-size: 9px;
-}
-
-.grid label.full {
-  grid-column: 1 / -1;
-}
-
-.grid input {
-  width: 100%;
-  min-width: 0;
-  padding: 8px 9px;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,.08);
-  background: #111216;
-  color: #efeff2;
-  outline: none;
-  font-size: 10px;
-}
-
-.grid input:focus {
-  border-color: rgba(255,255,255,.2);
-}
-
-.text-btn {
-  background: transparent;
-  color: #cfcfd6;
-  font-size: 10px;
 }
 
 footer {
