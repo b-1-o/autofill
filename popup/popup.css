@@ -1,0 +1,38 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { width: 370px; margin: 0; background: #090a0c; color: #f4f4f6; }
+button, input { font: inherit; }
+button { border: 0; cursor: pointer; }
+.app { padding: 16px; }
+.topbar, .profile-card, .document-row, footer { display: flex; align-items: center; justify-content: space-between; }
+.topbar { margin-bottom: 14px; }
+.eyebrow { font-size: 8px; letter-spacing: .16em; color: #767781; margin-bottom: 3px; }
+h1 { margin: 0; font-size: 20px; }
+.mark { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid rgba(255,255,255,.14); border-radius: 9px; background: #111216; font-size: 9px; font-weight: 800; }
+.profile-card, .documents, .profile-editor { border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.03); border-radius: 13px; }
+.profile-card { padding: 13px; margin-bottom: 10px; }
+.profile-name { font-weight: 700; font-size: 14px; }
+.profile-email { margin-top: 3px; color: #8f9099; font-size: 10px; }
+.fill-button { width: 100%; padding: 12px; border-radius: 11px; background: #f0f0f2; color: #0a0a0c; font-weight: 800; font-size: 12px; }
+.status { min-height: 28px; padding: 8px 2px 6px; color: #94959e; font-size: 10px; }
+.documents, .profile-editor { padding: 12px; margin-top: 4px; }
+.section-title { font-size: 9px; text-transform: uppercase; letter-spacing: .12em; color: #8b8c95; margin-bottom: 7px; }
+.document-row { gap: 10px; padding: 9px 0; border-top: 1px solid rgba(255,255,255,.06); }
+.document-row:first-of-type { border-top: 0; }
+.document-row strong { display: block; font-size: 10px; }
+.document-row span { color: #777882; display: block; font-size: 8px; }
+.download { padding: 6px 8px; border: 1px solid rgba(255,255,255,.08); border-radius: 7px; background: #17181c; color: #e8e8eb; font-size: 9px; }
+.edit-button, .save-button { width: 100%; border-radius: 10px; font-size: 10px; font-weight: 700; }
+.edit-button { margin-top: 9px; padding: 9px; background: #141519; color: #d8d8dd; border: 1px solid rgba(255,255,255,.07); }
+.save-button { margin-top: 10px; padding: 10px; background: #dddde2; color: #0c0c0f; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.grid label { display: flex; flex-direction: column; gap: 4px; color: #898a93; font-size: 9px; }
+.grid .full { grid-column: 1 / -1; }
+.grid input { width: 100%; padding: 8px 9px; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; background: #101115; color: #efeff2; outline: 0; font-size: 10px; }
+.grid input:focus { border-color: rgba(255,255,255,.22); }
+.hidden { display: none; }
+footer { margin-top: 12px; color: #5f6069; font-size: 8px; }
+footer a { color: #9e9fa8; text-decoration: none; }
