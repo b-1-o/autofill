@@ -18,7 +18,6 @@
     jobTitle: ["current title", "job title", "title", "position", "role"],
     company: ["current company", "company", "employer", "current employer", "organization"],
     experienceTitle: ["experience title", "previous title", "role title", "position title"],
-    experienceDates: ["employment dates", "experience dates", "dates employed", "start date", "employment period"],
     skills: ["skills", "technical skills", "technologies", "tech stack", "stack"],
     summary: ["professional summary", "summary", "about you", "about yourself", "profile", "professional profile"],
     experienceDescription: ["experience description", "work experience", "job description", "responsibilities", "duties", "describe your experience"],
