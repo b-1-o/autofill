@@ -1,20 +1,45 @@
 {
   "manifest_version": 3,
-  "name": "Autofill — Job Applications",
-  "version": "0.3.0",
+  "name": "Autofill — Chrome Extension for Job Applications",
+  "version": "0.4.0",
   "description": "Review-first form autofill for job applications.",
-  "permissions": ["storage", "activeTab", "scripting"],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
   "host_permissions": [
     "https://*.linkedin.com/*",
     "https://*.jobright.ai/*",
     "https://*.greenhouse.io/*",
     "https://*.lever.co/*",
     "https://*.myworkdayjobs.com/*",
-    "https://*.ashbyhq.com/*"
+    "https://*.ashbyhq.com/*",
+    "https://*.indeed.com/*",
+    "https://*.ziprecruiter.com/*",
+    "https://*.glassdoor.com/*",
+    "https://*.smartrecruiters.com/*",
+    "https://*.workable.com/*",
+    "https://*.bamboohr.com/*",
+    "https://*.recruitee.com/*",
+    "https://*.jobvite.com/*",
+    "https://*.icims.com/*",
+    "https://*.taleo.net/*",
+    "https://your-project.vercel.app/*"
   ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "action": {
-    "default_title": "Autofill",
-    "default_popup": "popup/popup.html"
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_popup": "popup/popup.html",
+    "default_title": "Autofill"
   },
   "background": {
     "service_worker": "background/service-worker.js"
@@ -27,9 +52,25 @@
         "https://*.greenhouse.io/*",
         "https://*.lever.co/*",
         "https://*.myworkdayjobs.com/*",
-        "https://*.ashbyhq.com/*"
+        "https://*.ashbyhq.com/*",
+        "https://*.indeed.com/*",
+        "https://*.ziprecruiter.com/*",
+        "https://*.glassdoor.com/*",
+        "https://*.smartrecruiters.com/*",
+        "https://*.workable.com/*",
+        "https://*.bamboohr.com/*",
+        "https://*.recruitee.com/*",
+        "https://*.jobvite.com/*",
+        "https://*.icims.com/*",
+        "https://*.taleo.net/*"
       ],
-      "js": ["content/content.js"],
+      "js": [
+        "content/field-map.js",
+        "content/field-finder.js",
+        "content/field-setter.js",
+        "content/platform-detector.js",
+        "content/content.js"
+      ],
       "run_at": "document_idle",
       "all_frames": true
     }
