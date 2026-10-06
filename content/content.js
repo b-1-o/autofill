@@ -1,101 +1,283 @@
 (() => {
-  if (window.__B1O_AUTOFILL_LOADED__) return;
-  window.__B1O_AUTOFILL_LOADED__ = true;
+  if (globalThis.__B1O_AUTOFILL_INITIALIZED__) {
+    return;
+  }
+
+  globalThis.__B1O_AUTOFILL_INITIALIZED__ = true;
+
+  const STORAGE_KEY = "profile";
 
   const FIELD_MAP = {
-    firstName: ["first name", "firstname", "given name", "given-name", "fname"],
-    lastName: ["last name", "lastname", "surname", "family name", "family-name", "lname"],
-    email: ["email", "e-mail", "email address"],
-    phone: ["phone", "mobile", "cell", "telephone", "phone number", "mobile phone"],
-    location: ["location", "city", "home city", "current city", "address city"],
-    company: ["current company", "company", "employer", "organization", "current employer"],
-    linkedin: ["linkedin", "linkedin url", "linkedin profile"],
-    github: ["github", "github url", "github profile"],
-    portfolio: ["portfolio", "personal website", "website", "website url", "portfolio url"],
+    firstName: [
+      "first name",
+      "firstname",
+      "given name",
+      "given-name",
+      "fname",
+      "first"
+    ],
+    lastName: [
+      "last name",
+      "lastname",
+      "surname",
+      "family name",
+      "lname",
+      "last"
+    ],
+    email: [
+      "email",
+      "e-mail",
+      "email address",
+      "emailaddress"
+    ],
+    phone: [
+      "phone",
+      "mobile",
+      "cell",
+      "telephone",
+      "phone number",
+      "mobile phone",
+      "cell phone",
+      "contact number"
+    ],
+    location: [
+      "location",
+      "city",
+      "home city",
+      "current city",
+      "city state",
+      "city/state",
+      "location city"
+    ],
+    company: [
+      "company",
+      "current company",
+      "employer",
+      "current employer",
+      "organization",
+      "present company",
+      "present employer"
+    ],
+    linkedin: [
+      "linkedin",
+      "linkedin url",
+      "linkedin profile",
+      "linkedin profile url"
+    ],
+    github: [
+      "github",
+      "github url",
+      "github profile",
+      "github profile url"
+    ],
+    portfolio: [
+      "portfolio",
+      "portfolio url",
+      "website",
+      "website url",
+      "personal site",
+      "personal website",
+      "personal website url"
+    ],
+    yearsOfExperience: [
+      "years of experience",
+      "years experience",
+      "experience years",
+      "total experience",
+      "professional experience"
+    ],
     authorizedToWork: [
       "authorized to work",
       "work authorization",
       "legally authorized",
+      "legally eligible",
       "eligible to work",
       "right to work",
-      "authorized for employment"
+      "authorized for employment",
+      "authorized to work in the us",
+      "authorized to work in united states"
     ],
     requiresSponsorship: [
       "requires sponsorship",
       "require sponsorship",
       "sponsorship",
       "visa sponsorship",
-      "future sponsorship"
+      "future sponsorship",
+      "need sponsorship",
+      "will you require sponsorship"
     ]
   };
 
-  const normalize = (value) =>
-    String(value || "")
+  function normalize(value) {
+    return String(value ?? "")
       .toLowerCase()
+      .trim()
       .replace(/[^a-z0-9]+/g, " ")
+      .replace(/\s+/g, " ")
       .trim();
+  }
 
-  function collectFieldText(el) {
-    const values = [
-      el.getAttribute("aria-label"),
+  function getLabelText(el) {
+    const values = [];
+
+    if (el.id) {
+      const explicitLabel = document.querySelector(
+        'label[for="' + CSS.escape(el.id) + '"]'
+      );
+
+      if (explicitLabel) {
+        values.push(explicitLabel.textContent);
+      }
+    }
+
+    const parentLabel = el.closest("label");
+    if (parentLabel) {
+      values.push(parentLabel.textContent);
+    }
+
+    const ariaLabel = el.getAttribute("aria-label");
+    if (ariaLabel) {
+      values.push(ariaLabel);
+    }
+
+    const labelledBy = el.getAttribute("aria-labelledby");
+    if (labelledBy) {
+      for (const id of labelledBy.split(/\s+/)) {
+        const labelledNode = document.getElementById(id);
+        if (labelledNode) {
+          values.push(labelledNode.textContent);
+        }
+      }
+    }
+
+    return values.filter(Boolean).join(" ");
+  }
+
+  function getFieldTokens(el) {
+    return [
+      getLabelText(el),
       el.getAttribute("name"),
       el.getAttribute("id"),
       el.getAttribute("placeholder"),
       el.getAttribute("autocomplete"),
       el.getAttribute("data-testid")
-    ].filter(Boolean);
+    ]
+      .filter(Boolean)
+      .map(normalize)
+      .filter(Boolean);
+  }
 
-    for (const label of el.labels || []) values.push(label.textContent);
+  function tokenMatchesAlias(token, alias) {
+    const normalizedAlias = normalize(alias);
 
-    const parentLabel = el.closest("label");
-    if (parentLabel) values.push(parentLabel.textContent);
-
-    const fieldset = el.closest("fieldset");
-    const legend = fieldset?.querySelector("legend");
-    if (legend) values.push(legend.textContent);
-
-    const labelledBy = el.getAttribute("aria-labelledby");
-    if (labelledBy) {
-      for (const id of labelledBy.split(/\s+/)) {
-        const node = document.getElementById(id);
-        if (node) values.push(node.textContent);
-      }
+    if (!normalizedAlias) {
+      return false;
     }
 
-    return values.map(normalize).filter(Boolean);
+    return (
+      token === normalizedAlias ||
+      token.split(" ").includes(normalizedAlias) ||
+      token.includes(normalizedAlias)
+    );
   }
 
-  function aliasScore(text, alias) {
-    if (text === alias) return 4;
-    if (text.split(" ").includes(alias)) return 3;
-    if (text.includes(alias)) return 1;
-    return 0;
-  }
+  function findField(aliases, root = document) {
+    const aliasList = aliases.map(normalize).filter(Boolean);
+    const candidates = [
+      ...root.querySelectorAll("input, textarea, select")
+    ];
 
-  function findFieldKey(el) {
-    const texts = collectFieldText(el);
-    let best = null;
+    let bestMatch = null;
+    let bestScore = 0;
 
-    for (const [key, aliases] of Object.entries(FIELD_MAP)) {
-      for (const alias of aliases) {
-        const needle = normalize(alias);
-        for (const text of texts) {
-          const score = aliasScore(text, needle);
-          if (!best || score > best.score) best = score ? { key, score } : best;
+    for (const el of candidates) {
+      if (isExcludedField(el)) {
+        continue;
+      }
+
+      const tokens = getFieldTokens(el);
+
+      for (const token of tokens) {
+        for (const alias of aliasList) {
+          if (token === alias && bestScore < 3) {
+            bestScore = 3;
+            bestMatch = el;
+          } else if (tokenMatchesAlias(token, alias) && bestScore < 2) {
+            bestScore = 2;
+            bestMatch = el;
+          }
         }
       }
     }
 
-    return best?.key || null;
+    return bestMatch;
+  }
+
+  function findFields(aliases, root = document) {
+    const aliasList = aliases.map(normalize).filter(Boolean);
+    const matches = [];
+
+    for (const el of root.querySelectorAll("input, textarea, select")) {
+      if (isExcludedField(el)) {
+        continue;
+      }
+
+      const tokens = getFieldTokens(el);
+
+      if (
+        tokens.some((token) =>
+          aliasList.some((alias) => tokenMatchesAlias(token, alias))
+        )
+      ) {
+        matches.push(el);
+      }
+    }
+
+    return matches;
+  }
+
+  function isExcludedField(el) {
+    const type = normalize(el.getAttribute("type"));
+
+    return (
+      el.disabled ||
+      el.readOnly ||
+      el.hidden ||
+      type === "hidden" ||
+      type === "file" ||
+      type === "password" ||
+      type === "submit" ||
+      type === "button" ||
+      type === "reset" ||
+      el.getAttribute("aria-hidden") === "true"
+    );
+  }
+
+  function isStreetAddressField(el) {
+    const autocomplete = normalize(el.getAttribute("autocomplete"));
+    const tokens = getFieldTokens(el).join(" ");
+
+    return (
+      autocomplete === "street address" ||
+      tokens.includes("street address") ||
+      tokens.includes("address line 1") ||
+      tokens.includes("address line 2")
+    );
   }
 
   function setNativeValue(el, value) {
-    const prototype = Object.getPrototypeOf(el);
-    const descriptor = Object.getOwnPropertyDescriptor(prototype, "value");
-    const setter = descriptor?.set;
+    const proto =
+      el instanceof HTMLTextAreaElement
+        ? HTMLTextAreaElement.prototype
+        : HTMLInputElement.prototype;
 
-    if (setter) setter.call(el, value);
-    else el.value = value;
+    const descriptor = Object.getOwnPropertyDescriptor(proto, "value");
+
+    if (!descriptor?.set) {
+      throw new Error("Native value setter is unavailable");
+    }
+
+    descriptor.set.call(el, value);
 
     el.dispatchEvent(new Event("input", { bubbles: true }));
     el.dispatchEvent(new Event("change", { bubbles: true }));
@@ -104,128 +286,249 @@
 
   function setSelect(el, value) {
     const target = normalize(value);
+
+    if (!target) {
+      return false;
+    }
+
     const options = [...el.options];
 
-    const exact = options.find((option) => {
-      const text = normalize(option.textContent);
+    const exactIndex = options.findIndex((option) => {
+      const optionText = normalize(option.textContent);
       const optionValue = normalize(option.value);
-      return text === target || optionValue === target;
+      return optionText === target || optionValue === target;
     });
 
-    const fuzzy = options.find((option) => {
-      const text = normalize(option.textContent);
+    const fuzzyIndex = options.findIndex((option) => {
+      const optionText = normalize(option.textContent);
       const optionValue = normalize(option.value);
-      return text.includes(target) || optionValue.includes(target);
+
+      return (
+        optionText.includes(target) ||
+        target.includes(optionText) ||
+        optionValue.includes(target) ||
+        target.includes(optionValue)
+      );
     });
 
-    const match = exact || fuzzy;
-    if (!match) return false;
+    const index = exactIndex >= 0 ? exactIndex : fuzzyIndex;
 
-    // Avoid replacing a deliberate user selection.
-    if (el.value && normalize(el.value) !== target) return false;
+    if (index < 0) {
+      return false;
+    }
 
-    el.value = match.value;
+    el.selectedIndex = index;
+    el.dispatchEvent(new Event("input", { bubbles: true }));
     el.dispatchEvent(new Event("change", { bubbles: true }));
+
     return true;
   }
 
-  function choiceText(input) {
-    return normalize([
-      input.value,
-      input.getAttribute("aria-label"),
-      input.labels?.[0]?.textContent,
-      input.closest("label")?.textContent
-    ].filter(Boolean).join(" "));
+  function getChoiceText(input) {
+    const values = [input.value, input.getAttribute("aria-label")];
+
+    if (input.id) {
+      const label = document.querySelector(
+        'label[for="' + CSS.escape(input.id) + '"]'
+      );
+      if (label) values.push(label.textContent);
+    }
+
+    const parentLabel = input.closest("label");
+    if (parentLabel) values.push(parentLabel.textContent);
+
+    return normalize(values.filter(Boolean).join(" "));
   }
 
-  function setChoice(input, value) {
+  function setRadioOrCheckbox(name, value, root = document) {
     const target = normalize(value);
-    const group = input.name
-      ? [...document.querySelectorAll('input[name="' + CSS.escape(input.name) + '"]')]
-      : [input];
 
-    if (group.some((candidate) => candidate.checked)) return false;
+    if (!name || !target) {
+      return false;
+    }
 
-    const match = group.find((candidate) => {
-      const text = choiceText(candidate);
-      if (target === "yes") return text === "yes" || text.includes("yes");
-      if (target === "no") return text === "no" || text.includes("no");
+    const selector =
+      'input[name="' +
+      CSS.escape(name) +
+      '"][type="radio"], input[name="' +
+      CSS.escape(name) +
+      '"][type="checkbox"]';
+
+    const group = [...root.querySelectorAll(selector)];
+
+    if (!group.length || group.some((input) => input.checked)) {
+      return false;
+    }
+
+    const match = group.find((input) => {
+      const text = getChoiceText(input);
+
+      if (target === "yes") {
+        return text === "yes" || text.startsWith("yes ");
+      }
+
+      if (target === "no") {
+        return text === "no" || text.startsWith("no ");
+      }
+
       return text === target || text.includes(target);
     });
 
-    if (!match) return false;
+    if (!match) {
+      return false;
+    }
+
     match.click();
     return true;
   }
 
-  function fillField(el, profile) {
-    if (el.disabled || el.readOnly) return false;
-
-    const key = findFieldKey(el);
-    if (!key) return false;
-
-    const value = profile[key];
-    if (value === undefined || value === null || value === "") return false;
-
-    const type = normalize(el.getAttribute("type"));
-    if (["file", "hidden", "submit", "button", "reset"].includes(type)) return false;
-
-    if (el.tagName === "SELECT") return setSelect(el, value);
-
-    if (type === "radio" || type === "checkbox") {
-      return setChoice(el, value);
+  function fillOneField(key, value, root = document) {
+    if (value === undefined || value === null || String(value).trim() === "") {
+      return false;
     }
 
-    if (String(el.value || "").trim()) return false;
+    const candidates = findFields(FIELD_MAP[key] || [], root);
+    let changed = false;
 
-    setNativeValue(el, value);
-    return true;
+    for (const el of candidates) {
+      if (isExcludedField(el)) {
+        continue;
+      }
+
+      if (key === "location" && isStreetAddressField(el)) {
+        continue;
+      }
+
+      const type = normalize(el.getAttribute("type"));
+
+      if (el.tagName === "SELECT") {
+        if (setSelect(el, value)) {
+          changed = true;
+        }
+        continue;
+      }
+
+      if (type === "radio" || type === "checkbox") {
+        if (el.name && setRadioOrCheckbox(el.name, value, root)) {
+          changed = true;
+        }
+        continue;
+      }
+
+      if (String(el.value ?? "").trim()) {
+        continue;
+      }
+
+      setNativeValue(el, String(value));
+      changed = true;
+    }
+
+    return changed;
   }
 
-  function fillAll(profile) {
+  function fillAllFormFields(profile, root = document) {
     let filled = 0;
 
-    for (const field of document.querySelectorAll("input, textarea, select")) {
-      if (fillField(field, profile)) filled++;
+    for (const [key, value] of Object.entries(profile)) {
+      if (!Object.prototype.hasOwnProperty.call(FIELD_MAP, key)) {
+        continue;
+      }
+
+      if (fillOneField(key, value, root)) {
+        filled += 1;
+      }
     }
 
     return filled;
   }
 
-  function watchForAsyncFields(profile) {
-    let debounce = null;
+  async function getSavedProfile() {
+    const result = await chrome.storage.sync.get(STORAGE_KEY);
+    return result[STORAGE_KEY] || {};
+  }
+
+  function startMutationObserver(profile) {
+    if (globalThis.__B1O_MUTATION_OBSERVER__) {
+      globalThis.__B1O_MUTATION_OBSERVER__.disconnect();
+    }
+
+    if (!document.body) {
+      return;
+    }
+
+    let timer = null;
 
     const observer = new MutationObserver(() => {
-      clearTimeout(debounce);
-      debounce = setTimeout(() => fillAll(profile), 100);
+      clearTimeout(timer);
+
+      timer = setTimeout(() => {
+        fillAllFormFields(profile);
+      }, 120);
     });
 
-    observer.observe(document.documentElement, {
+    observer.observe(document.body, {
       childList: true,
       subtree: true
     });
 
+    globalThis.__B1O_MUTATION_OBSERVER__ = observer;
+
     setTimeout(() => {
       observer.disconnect();
-      clearTimeout(debounce);
-    }, 7000);
+
+      if (timer) {
+        clearTimeout(timer);
+      }
+
+      if (globalThis.__B1O_MUTATION_OBSERVER__ === observer) {
+        globalThis.__B1O_MUTATION_OBSERVER__ = null;
+      }
+    }, 10000);
+  }
+
+  async function fillFromStorage() {
+    const profile = await getSavedProfile();
+    const filled = fillAllFormFields(profile);
+    startMutationObserver(profile);
+    return filled;
   }
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message?.action === "ping") {
-      sendResponse({ ok: true });
+    if (message?.type !== "FILL_FORM") {
       return;
     }
 
-    if (message?.action === "fill") {
-      if (message.tabId !== sender.tab?.id) return;
-      const filled = fillAll(message.profile || {});
-      watchForAsyncFields(message.profile || {});
+    try {
+      const profile = message.profile || {};
+      const filled = fillAllFormFields(profile);
+
+      startMutationObserver(profile);
 
       sendResponse({
         ok: true,
         filled
       });
+    } catch (error) {
+      console.error("Autofill error:", error);
+
+      sendResponse({
+        ok: false,
+        filled: 0,
+        error: String(error)
+      });
     }
   });
+
+  document.addEventListener("B1O_AUTOFILL_REQUEST", () => {
+    fillFromStorage()
+      .then((filled) => {
+        console.debug("Autofill embedded frame filled:", filled);
+      })
+      .catch((error) => {
+        console.error("Autofill embedded frame error:", error);
+      });
+  });
+
+  // Keep findField available for debugging from the extension's isolated world.
+  globalThis.__B1O_findField__ = findField;
 })();
