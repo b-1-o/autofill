@@ -1,63 +1,78 @@
-# b1o Autofill
+# Autofill — Chrome Extension for Job Applications
 
-Minimal Manifest V3 browser extension for filling common job-application fields quickly.
+Review-first Chrome extension for quickly filling common job-application forms.
 
-## MVP
+## Features
 
-- Profile stored in `chrome.storage.sync`.
-- Simple popup with **Fill Form** and **Edit Profile**.
-- Field matching by `label`, `name`, `id`, `placeholder`, and accessibility metadata.
-- React-safe input updates using the native value setter plus `input` / `change` events.
-- `select`, radio, and checkbox support.
-- `all_frames: true` so matching content scripts can run in embedded application frames.
-- `MutationObserver` watches briefly after Fill for fields that appear asynchronously.
-- CV and cover-letter downloads from the bundled `assets/` files.
-- No automatic submit.
+- Save a reusable application profile with Chrome Storage Sync.
+- Fill common fields by matching labels, names, IDs, placeholders, and accessibility metadata.
+- React-safe input updates using the native value setter and DOM events.
+- Support for text inputs, textareas, selects, radio buttons, and checkboxes.
+- MutationObserver support for dynamically rendered application forms.
+- Cross-frame fill support for embedded application forms.
+- Targeted content-script matches for LinkedIn, Jobright, Greenhouse, Lever, Workday, and Ashby.
+- Manual review before submission.
+- AI cover-letter button placeholder for future development.
+- No automatic form submission.
 
-Chrome's MV3 `scripting` API can inject a script into all frames, and this project keeps the extension content-script based for the MVP. citeturn131938search0
+## Tech Stack
 
-Chrome documents `storage.sync` as cross-browser Chrome Sync storage with roughly 100 KB total capacity and 8 KB per item, which is plenty for a small text profile. citeturn131938search1
+- Manifest V3
+- Vanilla JavaScript
+- Chrome Storage API
+- Chrome Scripting API
+- MutationObserver
+- CSS with automatic light/dark theme support
 
-## Install in Chrome / Brave
+## Installation
 
-1. Open `chrome://extensions/` or `brave://extensions/`.
-2. Enable **Developer mode**.
-3. Click **Load unpacked**.
-4. Select the repository folder.
-5. Pin **b1o Autofill**.
-6. Open **⚙ Edit Profile**, enter your values, and click **Save Profile**.
+1. Open chrome://extensions/ in Chrome or brave://extensions/ in Brave.
+2. Enable Developer mode.
+3. Click Load unpacked.
+4. Select the project directory.
+5. Open the extension popup.
+6. Enter your profile and click Save.
 
-## Usage
+## How it works
 
-1. Open a job application page.
-2. Open the extension.
-3. Press **Fill Form**.
-4. Review every filled field and screening question.
-5. Upload the requested CV/cover letter.
-6. Submit manually.
+Popup → chrome.storage.sync → content script → DOM
 
-## Profile
+1. The popup saves the profile in Chrome Sync storage.
+2. Fill Form sends FILL_FORM to the current tab's main frame with chrome.tabs.sendMessage.
+3. The popup also uses chrome.scripting.executeScript with allFrames: true to trigger filling inside embedded frames.
+4. The content script maps page controls to profile fields using FIELD_MAP.
+5. React-safe native setters and input/change/blur events update controlled form elements.
+6. MutationObserver watches for newly rendered controls for a short window after Fill Form.
+7. The user reviews the completed form and submits it manually.
 
-The popup stores the profile in `chrome.storage.sync` so Chrome can sync it between signed-in browser instances.
+## Supported Sites
 
-Do not store passwords, API keys, session tokens, or other confidential secrets in the profile. Chrome notes that sync/local extension storage is not encrypted. citeturn131938search2
+Initial host and content-script matches cover:
 
-## File layout
+- LinkedIn
+- Jobright
+- Greenhouse
+- Lever
+- Workday
+- Ashby
 
-```
-autofill/
-├── manifest.json
-├── popup/
-│   ├── popup.html
-│   ├── popup.css
-│   └── popup.js
-├── content/
-│   └── content.js
-├── background/
-│   └── service-worker.js
-└── assets/
-```
+A particular application can still require manual entry when it uses custom widgets, unusual markup, cross-origin restrictions, or CAPTCHA.
+
+## Roadmap
+
+- AI-powered cover-letter generation.
+- Support for more job boards and ATS platforms.
+- Automatic ATS-platform detection.
+- Better custom combobox and autocomplete support.
+- Field confidence scoring and review summaries.
+- Optional per-site profiles.
+
+## Privacy
+
+This MVP has no external backend or analytics service. Profile data is stored through the Chrome extension storage API.
+
+Do not store passwords, session tokens, API keys, or other secrets in the profile.
 
 ## Scope
 
-This is intentionally an MVP. It does not auto-submit, solve CAPTCHAs, bypass website protections, or invent answers to screening questions.
+This project intentionally does not auto-submit applications, solve CAPTCHAs, or invent screening answers.
