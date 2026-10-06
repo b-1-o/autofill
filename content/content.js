@@ -47,7 +47,8 @@
       "current city",
       "city state",
       "city/state",
-      "location city"
+      "location city",
+      "address"
     ],
     company: [
       "company",
@@ -314,6 +315,18 @@
     const index = exactIndex >= 0 ? exactIndex : fuzzyIndex;
 
     if (index < 0) {
+
+      return false;
+    }
+
+    const currentOption = options[el.selectedIndex];
+    if (
+      currentOption &&
+      (
+        normalize(currentOption.textContent) === target ||
+        normalize(currentOption.value) === target
+      )
+    ) {
       return false;
     }
 
