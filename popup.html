@@ -19,7 +19,7 @@
     <section class="hero-card">
       <div class="hero-title">Erik Ghabuzyan</div>
       <div class="hero-subtitle">Frontend Developer · UI Engineer</div>
-      <div id="pageHint" class="muted">Ready to scan the current page.</div>
+      <div id="pageHint" class="muted">Complete your local profile once, then reuse it on application forms.</div>
     </section>
 
     <section class="actions">
@@ -60,23 +60,13 @@
       </div>
     </section>
 
-    <section class="toggle-card">
-      <div>
-        <strong>Include sensitive EEO fields</strong>
-        <div class="muted small">Off by default. Review every answer before submitting.</div>
-      </div>
-      <label class="switch">
-        <input id="sensitiveToggle" type="checkbox">
-        <span></span>
-      </label>
-    </section>
-
     <section class="profile">
       <div class="section-heading">
         <span>Profile</span>
-        <button id="saveBtn" class="text-btn">Save</button>
+        <button id="saveBtn" class="text-btn">Save locally</button>
       </div>
 
+      <div class="subheading">Contact</div>
       <div class="grid">
         <label>First name<input id="firstName" autocomplete="given-name"></label>
         <label>Last name<input id="lastName" autocomplete="family-name"></label>
@@ -89,7 +79,40 @@
         <label class="full">LinkedIn<input id="linkedin"></label>
         <label class="full">GitHub<input id="github"></label>
         <label class="full">Portfolio<input id="portfolio"></label>
-        <label class="full">Professional title<input id="jobTitle"></label>
+      </div>
+
+      <div class="subheading">Professional</div>
+      <div class="grid">
+        <label class="full">Target / current title<input id="jobTitle"></label>
+        <label>Company<input id="company"></label>
+        <label>Experience title<input id="experienceTitle"></label>
+        <label class="full">Experience dates<input id="experienceDates"></label>
+        <label class="full">Skills (comma separated)<input id="skills"></label>
+        <label class="full">Professional summary<textarea id="summary" rows="4"></textarea></label>
+        <label class="full">Experience description<textarea id="experienceDescription" rows="5"></textarea></label>
+      </div>
+
+      <div class="subheading eeo-heading">
+        <span>EEO / optional</span>
+        <label class="switch">
+          <input id="sensitiveToggle" type="checkbox">
+          <span></span>
+        </label>
+      </div>
+      <div id="sensitiveSection" class="sensitive-section">
+        <div class="muted small">These values are optional and are stored only in this browser. Review every answer before submitting.</div>
+        <div class="grid">
+          <label>Work authorized<input id="workAuthorized"></label>
+          <label>Sponsorship required<input id="sponsorship"></label>
+          <label>Disability<input id="disability"></label>
+          <label>Gender<input id="gender"></label>
+          <label>LGBTQ+<input id="lgbtq"></label>
+          <label>Veteran<input id="veteran"></label>
+          <label>Race<input id="race"></label>
+          <label>Ethnicity<input id="ethnicity"></label>
+          <label>Orientation<input id="orientation"></label>
+          <label>Pronouns<input id="pronouns"></label>
+        </div>
       </div>
     </section>
 
