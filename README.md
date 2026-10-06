@@ -14,11 +14,6 @@ Target result: reduce a typical application workflow from ~15 minutes toward ~2 
 
 Replace the target with measured results after real testing.
 
-## Demo
-
-![Demo](./assets/demo.gif)
-
-(placeholder — GIF will be added)
 
 ## Features
 
