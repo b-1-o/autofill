@@ -1,0 +1,5 @@
+node_modules/
+*.pdf
+*.zip
+.DS_Store
+*.log
