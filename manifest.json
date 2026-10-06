@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Autofill — Chrome Extension for Job Applications",
-  "version": "0.4.0",
-  "description": "Review-first form autofill for job applications.",
+  "version": "0.5.0",
+  "description": "Review-first form autofill for modern job application forms.",
   "permissions": [
     "storage",
     "activeTab",
@@ -25,7 +25,7 @@
     "https://*.jobvite.com/*",
     "https://*.icims.com/*",
     "https://*.taleo.net/*",
-    "https://your-project.vercel.app/*"
+    "http://localhost:3000/*"
   ],
   "icons": {
     "16": "icons/icon16.png",
@@ -68,7 +68,7 @@
         "content/field-map.js",
         "content/field-finder.js",
         "content/field-setter.js",
-        "content/platform-detector.js",
+        "content/form-filler.js",
         "content/content.js"
       ],
       "run_at": "document_idle",
