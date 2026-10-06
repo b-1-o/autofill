@@ -218,6 +218,7 @@
     }
 
     if (message?.action === "fill") {
+      if (message.tabId !== sender.tab?.id) return;
       const filled = fillAll(message.profile || {});
       watchForAsyncFields(message.profile || {});
 
