@@ -1,7 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
   "functions": {
     "api/generate.js": {
+      "runtime": "nodejs24.x",
       "maxDuration": 10
     }
   }
