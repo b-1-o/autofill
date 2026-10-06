@@ -1,6 +1,4 @@
 (() => {
-  if (window.top !== window) return;
-
   const SENSITIVE_KEYS = new Set([
     "disability", "gender", "lgbtq", "veteran", "race", "ethnicity", "orientation", "pronouns"
   ]);
@@ -10,7 +8,7 @@
     lastName: ["last name", "lastname", "family name", "family-name", "surname", "lname"],
     email: ["email", "e-mail", "email address"],
     phone: ["phone", "mobile", "mobile phone", "telephone", "phone number"],
-    address: ["street address", "address", "address line 1", "address1", "street"],
+    address: ["street address", "address line 1", "address1", "street", "address"],
     city: ["city", "town"],
     state: ["state", "province", "state/province", "state or province", "region"],
     zip: ["zip", "zip code", "postal code", "postcode"],
@@ -18,6 +16,12 @@
     github: ["github", "github url", "github profile"],
     portfolio: ["portfolio", "website", "personal website", "portfolio url", "website url"],
     jobTitle: ["current title", "job title", "title", "position", "role"],
+    company: ["current company", "company", "employer", "current employer", "organization"],
+    experienceTitle: ["experience title", "previous title", "role title", "position title"],
+    experienceDates: ["employment dates", "experience dates", "dates employed", "start date", "employment period"],
+    skills: ["skills", "technical skills", "technologies", "tech stack", "stack"],
+    summary: ["professional summary", "summary", "about you", "about yourself", "profile", "professional profile"],
+    experienceDescription: ["experience description", "work experience", "job description", "responsibilities", "duties", "describe your experience"],
     workAuthorized: ["authorized to work", "work authorization", "legally authorized", "eligible to work", "right to work"],
     sponsorship: ["sponsorship", "require sponsorship", "visa sponsorship", "future sponsorship"],
     disability: ["disability", "disabled"],
@@ -67,7 +71,14 @@
 
   function matchKey(el) {
     const haystack = labelText(el);
-    for (const [key, aliases] of Object.entries(FIELD_ALIASES)) {
+
+    // Longer aliases first to avoid "title" winning over "job title".
+    const keys = Object.entries(FIELD_ALIASES).sort((a, b) =>
+      Math.max(...b[1].map((x) => normalize(x).length)) -
+      Math.max(...a[1].map((x) => normalize(x).length))
+    );
+
+    for (const [key, aliases] of keys) {
       if (aliases.some((alias) => haystack.includes(normalize(alias)))) return key;
     }
 
@@ -102,7 +113,9 @@
   function chooseOption(el, wanted) {
     const target = normalize(wanted);
     const options = Array.from(el.options || []);
-    const exact = options.find((option) => normalize(option.textContent) === target || normalize(option.value) === target);
+    const exact = options.find((option) =>
+      normalize(option.textContent) === target || normalize(option.value) === target
+    );
     const fuzzy = options.find((option) => {
       const text = normalize(option.textContent);
       const value = normalize(option.value);
@@ -168,18 +181,9 @@
     return false;
   }
 
-  function isLikelyJobPage() {
-    const text = normalize(document.body?.innerText?.slice(0, 12000));
-    const signals = [
-      "apply now", "apply for this job", "application", "resume", "cover letter",
-      "work authorization", "linkedin", "github", "candidate information",
-      "greenhouse", "lever", "workday", "icims", "ashby"
-    ];
-    return signals.filter((signal) => text.includes(normalize(signal))).length >= 2;
-  }
-
   function addResumeHelper() {
     const inputs = Array.from(document.querySelectorAll('input[type="file"]'));
+
     for (const input of inputs) {
       if (input.dataset.b1oHelper) continue;
 
@@ -190,6 +194,7 @@
       button.type = "button";
       button.textContent = descriptor.includes("cover letter") ? "Get cover letter" : "Get CV";
       button.dataset.b1oHelperButton = "1";
+
       Object.assign(button.style, {
         marginLeft: "8px",
         padding: "5px 9px",
@@ -217,13 +222,24 @@
 
   function collectFields() {
     return Array.from(document.querySelectorAll("input, select, textarea"))
-      .filter((el) => !["submit", "button", "hidden"].includes(normalize(el.getAttribute("type"))));
+      .filter((el) => !["submit", "button", "hidden", "file"].includes(normalize(el.getAttribute("type"))));
+  }
+
+  function isLikelyJobPage() {
+    const text = normalize(document.body?.innerText?.slice(0, 12000));
+    const signals = [
+      "apply now", "apply for this job", "application", "resume", "cover letter",
+      "work authorization", "linkedin", "github", "candidate information",
+      "greenhouse", "lever", "workday", "icims", "ashby"
+    ];
+    return signals.filter((signal) => text.includes(normalize(signal))).length >= 2;
   }
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message?.type === "scan") {
       const fields = collectFields();
       const detected = fields.filter((field) => matchKey(field)).length;
+
       sendResponse({
         ok: true,
         page: isLikelyJobPage() ? "Application/job form detected." : "General web page scanned.",
@@ -235,13 +251,11 @@
     if (message?.type === "autofill") {
       const fields = collectFields();
       let filled = 0;
-      let recognized = 0;
       let skippedSensitive = 0;
 
       for (const field of fields) {
         const key = matchKey(field);
         if (!key) continue;
-        recognized++;
 
         if (SENSITIVE_KEYS.has(key) && !message.profile?.sensitive) {
           skippedSensitive++;
@@ -255,7 +269,10 @@
 
       sendResponse({
         ok: true,
-        message: filled + " field(s) filled. " + (skippedSensitive ? skippedSensitive + " sensitive field(s) left untouched." : "Review before submitting.")
+        message: filled + " field(s) filled. " +
+          (skippedSensitive
+            ? skippedSensitive + " sensitive field(s) left untouched."
+            : "Review before submitting.")
       });
     }
   });
