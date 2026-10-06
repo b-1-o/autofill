@@ -24,18 +24,73 @@
         </div>
 
         <div class="grid">
-          <label>First name<input id="firstName" name="firstName" autocomplete="given-name"></label>
-          <label>Last name<input id="lastName" name="lastName" autocomplete="family-name"></label>
-          <label class="full">Email<input id="email" name="email" type="email" autocomplete="email"></label>
-          <label>Phone<input id="phone" name="phone" type="tel" autocomplete="tel"></label>
-          <label>Location<input id="location" name="location" placeholder="City, State"></label>
-          <label class="full">Company<input id="company" name="company"></label>
-          <label class="full">LinkedIn<input id="linkedin" name="linkedin" type="url" placeholder="https://..."></label>
-          <label class="full">GitHub<input id="github" name="github" type="url" placeholder="https://..."></label>
-          <label class="full">Portfolio<input id="portfolio" name="portfolio" type="url" placeholder="https://..."></label>
-          <label>Years of experience<input id="yearsOfExperience" name="yearsOfExperience" type="number" min="0" step="1"></label>
-          <label>Authorized to work<select id="authorizedToWork" name="authorizedToWork"><option value="">Choose...</option><option value="Yes">Yes</option><option value="No">No</option></select></label>
-          <label>Requires sponsorship<select id="requiresSponsorship" name="requiresSponsorship"><option value="">Choose...</option><option value="Yes">Yes</option><option value="No">No</option></select></label>
+          <label>
+            First name
+            <input id="firstName" name="firstName" autocomplete="given-name">
+          </label>
+
+          <label>
+            Last name
+            <input id="lastName" name="lastName" autocomplete="family-name">
+          </label>
+
+          <label class="full">
+            Email
+            <input id="email" name="email" type="email" autocomplete="email">
+          </label>
+
+          <label>
+            Phone
+            <input id="phone" name="phone" type="tel" autocomplete="tel">
+          </label>
+
+          <label>
+            Location
+            <input id="location" name="location" placeholder="City, State">
+          </label>
+
+          <label class="full">
+            Company
+            <input id="company" name="company">
+          </label>
+
+          <label class="full">
+            LinkedIn
+            <input id="linkedin" name="linkedin" type="url" placeholder="https://...">
+          </label>
+
+          <label class="full">
+            GitHub
+            <input id="github" name="github" type="url" placeholder="https://...">
+          </label>
+
+          <label class="full">
+            Portfolio
+            <input id="portfolio" name="portfolio" type="url" placeholder="https://...">
+          </label>
+
+          <label>
+            Years of experience
+            <input id="yearsOfExperience" name="yearsOfExperience" type="number" min="0" step="1">
+          </label>
+
+          <label>
+            Authorized to work
+            <select id="authorizedToWork" name="authorizedToWork">
+              <option value="">Choose...</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </label>
+
+          <label>
+            Requires sponsorship
+            <select id="requiresSponsorship" name="requiresSponsorship">
+              <option value="">Choose...</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </label>
         </div>
 
         <div class="actions">
@@ -45,21 +100,59 @@
 
         <p id="status" class="status" role="status" aria-live="polite">Ready.</p>
       </section>
+
+      <section class="card cover-card">
+        <div class="section-heading">
+          <div>
+            <h2>Cover letter template</h2>
+            <span class="hint">Stored locally in Chrome Sync</span>
+          </div>
+
+          <button id="coverLetterButton" type="button" class="button ghost">
+            Generate with AI
+          </button>
+        </div>
+
+        <textarea
+          id="coverLetterTemplate"
+          name="coverLetterTemplate"
+          rows="7"
+          placeholder="Write or save a reusable cover-letter template..."
+        ></textarea>
+      </section>
     </form>
 
-    <section class="card ai-card">
-      <div>
-        <h2>Cover Letter</h2>
-        <p>AI generation will be connected later.</p>
+    <section id="reportCard" class="card report-card hidden">
+      <div class="section-heading">
+        <div>
+          <h2>Fill report</h2>
+          <span id="platform" class="hint">Platform: Unknown</span>
+        </div>
+
+        <strong id="reportSummary">Filled 0 / 12</strong>
       </div>
-      <button id="coverLetterButton" type="button" class="button ghost">Generate with AI</button>
+
+      <div id="reportList" class="report-list"></div>
+
+      <div class="unfilled">
+        <div class="unfilled-title">Check manually</div>
+        <div id="unfilledList" class="unfilled-list"></div>
+      </div>
     </section>
 
     <footer>
       <span>Review before submitting.</span>
-      <a href="https://github.com/b-1-o/autofill" target="_blank" rel="noreferrer">GitHub</a>
+
+      <a
+        href="https://github.com/b-1-o/autofill"
+        target="_blank"
+        rel="noreferrer"
+      >
+        GitHub
+      </a>
     </footer>
   </main>
+
   <script src="popup.js"></script>
 </body>
 </html>
