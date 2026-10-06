@@ -48,9 +48,7 @@
     window.location.hostname
   );
 
-  function isStreetAddressField(
-    el
-  ) {
+  function isStreetAddressField(el) {
     const autocomplete =
       finder.normalize(
         el.getAttribute(
@@ -64,24 +62,15 @@
         .join(" ");
 
     return (
-      autocomplete ===
-        "street address" ||
-      tokens.includes(
-        "street address"
-      ) ||
-      tokens.includes(
-        "address line 1"
-      ) ||
-      tokens.includes(
-        "address line 2"
-      )
+      autocomplete === "street address" ||
+      tokens.includes("street address") ||
+      tokens.includes("address line 1") ||
+      tokens.includes("address line 2")
     );
   }
 
   function isEmptyField(el) {
-    return !finder.hasMeaningfulValue(
-      el
-    );
+    return !finder.hasMeaningfulValue(el);
   }
 
   function fillProfileField(
@@ -108,15 +97,12 @@
     }
 
     /*
-     * Important for firstName / lastName:
-     * findFields() returns all matches sorted by confidence.
-     * If the best candidate is already occupied, continue
-     * to the next empty candidate instead of stopping.
+     * firstName / lastName and every other profile field
+     * use all ranked matches. If the strongest candidate
+     * is already occupied, the next empty candidate wins.
      */
     for (const el of candidates) {
-      if (
-        finder.isExcludedField(el)
-      ) {
+      if (finder.isExcludedField(el)) {
         continue;
       }
 
@@ -132,21 +118,12 @@
           el.getAttribute("type")
         );
 
-      if (
-        el.tagName === "SELECT"
-      ) {
-        if (
-          setter.setSelect(
-            el,
-            value
-          )
-        ) {
+      if (el.tagName === "SELECT") {
+        if (setter.setSelect(el, value)) {
           return true;
         }
 
-        if (
-          finder.hasMeaningfulValue(el)
-        ) {
+        if (finder.hasMeaningfulValue(el)) {
           return true;
         }
 
@@ -168,18 +145,14 @@
           return true;
         }
 
-        if (
-          finder.hasMeaningfulValue(el)
-        ) {
+        if (finder.hasMeaningfulValue(el)) {
           return true;
         }
 
         continue;
       }
 
-      if (
-        isEmptyField(el)
-      ) {
+      if (isEmptyField(el)) {
         setter.setNativeValue(
           el,
           String(value)
@@ -196,91 +169,86 @@
     profile,
     root = document
   ) {
-    return FIELD_ORDER.map(
-      (key) => {
-        const aliases =
-          FIELD_MAP[key] || [];
+    return FIELD_ORDER.map((key) => {
+      const aliases =
+        FIELD_MAP[key] || [];
 
-        const candidates =
-          finder.findFields(
-            aliases,
-            root
-          );
+      const candidates =
+        finder.findFields(
+          aliases,
+          root
+        );
 
-        const excludedSafe =
-          candidates.filter(
-            (el) => {
-              if (
-                key === "location" &&
-                isStreetAddressField(el)
-              ) {
-                return false;
-              }
-
-              return true;
-            }
-          );
-
-        const existing =
-          excludedSafe.some(
-            finder.hasMeaningfulValue
-          );
-
-        let filled =
-          existing;
-
-        if (!filled) {
-          try {
-            filled =
-              fillProfileField(
-                key,
-                profile[key],
-                root
-              ) || existing;
-          } catch (error) {
-            console.warn(
-              "[Autofill] Failed field:",
-              key,
-              error
-            );
+      const usableCandidates =
+        candidates.filter((el) => {
+          if (
+            key === "location" &&
+            isStreetAddressField(el)
+          ) {
+            return false;
           }
-        }
 
-        const afterFill =
-          finder.findFields(
-            aliases,
-            root
-          );
+          return true;
+        });
 
-        const finalFilled =
-          afterFill.some((el) => {
-            if (
-              key === "location" &&
-              isStreetAddressField(el)
-            ) {
-              return false;
-            }
+      const alreadyFilled =
+        usableCandidates.some(
+          finder.hasMeaningfulValue
+        );
 
-            return finder.hasMeaningfulValue(
-              el
-            );
-          });
+      let filled =
+        alreadyFilled;
 
-        return {
-          key,
-          label:
-            FIELD_LABELS[key] ||
+      if (!filled) {
+        try {
+          filled =
+            fillProfileField(
+              key,
+              profile[key],
+              root
+            ) || alreadyFilled;
+        } catch (error) {
+          console.warn(
+            "[Autofill] Failed field:",
             key,
-          filled:
-            Boolean(
-              filled ||
-              finalFilled
-            ),
-          found:
-            candidates.length > 0
-        };
+            error
+          );
+        }
       }
-    );
+
+      const afterFill =
+        finder.findFields(
+          aliases,
+          root
+        );
+
+      const finalFilled =
+        afterFill.some((el) => {
+          if (
+            key === "location" &&
+            isStreetAddressField(el)
+          ) {
+            return false;
+          }
+
+          return finder.hasMeaningfulValue(
+            el
+          );
+        });
+
+      return {
+        key,
+        label:
+          FIELD_LABELS[key] || key,
+        filled:
+          Boolean(
+            filled ||
+            finalFilled
+          ),
+        found:
+          candidates.length > 0
+      };
+    });
   }
 
   function fillAllFormFields(
@@ -298,9 +266,11 @@
       fields,
       filled:
         fields.filter(
-          (field) => field.filled
+          (field) =>
+            field.filled
         ).length,
-      total: fields.length
+      total:
+        fields.length
     };
   }
 
@@ -322,20 +292,18 @@
     let timer = null;
 
     const observer =
-      new MutationObserver(
-        () => {
-          clearTimeout(timer);
+      new MutationObserver(() => {
+        clearTimeout(timer);
 
-          timer = setTimeout(
-            () => {
-              fillAllFormFields(
-                profile
-              );
-            },
-            120
-          );
-        }
-      );
+        timer = setTimeout(
+          () => {
+            fillAllFormFields(
+              profile
+            );
+          },
+          120
+        );
+      });
 
     observer.observe(
       document.body,
@@ -348,24 +316,21 @@
     globalThis.__B1O_MUTATION_OBSERVER__ =
       observer;
 
-    setTimeout(
-      () => {
-        observer.disconnect();
+    setTimeout(() => {
+      observer.disconnect();
 
-        if (timer) {
-          clearTimeout(timer);
-        }
+      if (timer) {
+        clearTimeout(timer);
+      }
 
-        if (
-          globalThis.__B1O_MUTATION_OBSERVER__ ===
-          observer
-        ) {
-          globalThis.__B1O_MUTATION_OBSERVER__ =
-            null;
-        }
-      },
-      10000
-    );
+      if (
+        globalThis.__B1O_MUTATION_OBSERVER__ ===
+        observer
+      ) {
+        globalThis.__B1O_MUTATION_OBSERVER__ =
+          null;
+      }
+    }, 10000);
   }
 
   async function getSavedProfile() {
@@ -402,8 +367,18 @@
       sendResponse
     ) => {
       if (
-        message?.type !==
-        "FILL_FORM"
+        message?.type === "PING"
+      ) {
+        sendResponse({
+          ok: true,
+          platform
+        });
+
+        return;
+      }
+
+      if (
+        message?.type !== "FILL_FORM"
       ) {
         return;
       }
@@ -443,7 +418,8 @@
               })
             ),
           filled: 0,
-          total: FIELD_ORDER.length,
+          total:
+            FIELD_ORDER.length,
           error:
             String(error)
         });
