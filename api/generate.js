@@ -2,13 +2,9 @@ module.exports = async function handler(
   req,
   res
 ) {
-  const allowedOrigin =
-    process.env.EXTENSION_ORIGIN ||
-    "*";
-
   res.setHeader(
     "Access-Control-Allow-Origin",
-    allowedOrigin
+    "*"
   );
 
   res.setHeader(
@@ -58,41 +54,43 @@ module.exports = async function handler(
         });
     }
 
-    const skills =
-      profile.skills ||
-      "React, TypeScript, JavaScript, Next.js, and frontend development";
-
     /*
-     * STUB:
-     * Replace this block with a real OpenAI API call.
+     * PLACEHOLDER ONLY.
      *
-     * Keep the OpenAI key on Vercel as an environment variable.
-     * Never ship an OpenAI API key inside the Chrome extension.
+     * Replace this response with the real OpenAI fetch.
+     * Keep the OpenAI API key in Vercel environment variables.
+     * Never put the API key inside the Chrome extension.
      *
-     * Example future shape:
+     * Insert the real request here:
      *
-     * const openai = new OpenAI({
-     *   apiKey: process.env.OPENAI_API_KEY
-     * });
+     * const response = await fetch(
+     *   "https://api.openai.com/v1/responses",
+     *   {
+     *     method: "POST",
+     *     headers: {
+     *       "Authorization":
+     *         "Bearer " + process.env.OPENAI_API_KEY,
+     *       "Content-Type": "application/json"
+     *     },
+     *     body: JSON.stringify(...)
+     *   }
+     * );
      *
-     * const response = await openai.responses.create({
-     *   model: "gpt-5",
-     *   input: [...]
-     * });
-     *
-     * return res.json({
-     *   answer: response.output_text
+     * const data = await response.json();
+     * return res.status(200).json({
+     *   answer: data.output_text
      * });
      */
 
-    const answer =
-      `Based on my experience with ${skills}, I would bring a practical frontend focus, strong UI engineering habits, and experience shipping responsive web applications. I am particularly interested in this role because it aligns with the technologies and product work described in the application.`;
+    void question;
+    void jobDescription;
+    void profile;
 
     return res
       .status(200)
       .json({
-        answer,
-        stub: true
+        answer:
+          "AI endpoint placeholder. Connect OpenAI API here."
       });
   } catch (error) {
     console.error(
@@ -104,7 +102,7 @@ module.exports = async function handler(
       .status(500)
       .json({
         error:
-          "Failed to generate draft"
+          "Failed to generate cover letter"
       });
   }
 };
