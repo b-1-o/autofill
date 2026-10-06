@@ -126,9 +126,7 @@
 
   function findFields(aliases, root = document) {
     const candidates = [
-      ...root.querySelectorAll(
-        "input, textarea, select"
-      )
+      ...root.querySelectorAll("input, textarea, select")
     ];
 
     return candidates
@@ -153,14 +151,9 @@
   }
 
   function hasMeaningfulValue(el) {
-    const type = normalize(
-      el.getAttribute("type")
-    );
+    const type = normalize(el.getAttribute("type"));
 
-    if (
-      type === "radio" ||
-      type === "checkbox"
-    ) {
+    if (type === "radio" || type === "checkbox") {
       return el.checked;
     }
 
@@ -181,6 +174,21 @@
     );
   }
 
+  function detectPlatform() {
+    const host = window.location.hostname;
+
+    if (host.includes("greenhouse")) return "Greenhouse";
+    if (host.includes("lever")) return "Lever";
+    if (host.includes("myworkdayjobs")) return "Workday";
+    if (host.includes("ashbyhq")) return "Ashby";
+    if (host.includes("linkedin")) return "LinkedIn";
+    if (host.includes("jobright")) return "Jobright";
+    if (host.includes("indeed")) return "Indeed";
+    if (host.includes("smartrecruiters")) return "SmartRecruiters";
+
+    return "Unknown";
+  }
+
   globalThis.__B1O_FIELD_FINDER__ = Object.freeze({
     normalize,
     getLabelText,
@@ -188,6 +196,7 @@
     isExcludedField,
     findField,
     findFields,
-    hasMeaningfulValue
+    hasMeaningfulValue,
+    detectPlatform
   });
 })();
