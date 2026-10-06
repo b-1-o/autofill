@@ -2,66 +2,61 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Autofill</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <main class="app">
-    <header class="topbar">
+    <header class="header">
       <div>
-        <div class="eyebrow">JOB APPLICATIONS</div>
+        <p class="eyebrow">JOB APPLICATIONS</p>
         <h1>Autofill</h1>
       </div>
-      <div class="mark">B1O</div>
+      <span class="badge">MV3</span>
     </header>
 
-    <section class="profile-card">
-      <div class="profile-name" id="profileName">Your profile</div>
-      <div class="profile-email" id="profileEmail">Add your details in Edit Profile</div>
-    </section>
+    <form id="profileForm" novalidate>
+      <section class="card">
+        <div class="section-heading">
+          <h2>Profile</h2>
+          <span class="hint">Saved with Chrome Sync</span>
+        </div>
 
-    <button id="fillButton" class="fill-button">Fill Form</button>
-    <div id="status" class="status" role="status">Ready.</div>
+        <div class="grid">
+          <label>First name<input id="firstName" name="firstName" autocomplete="given-name"></label>
+          <label>Last name<input id="lastName" name="lastName" autocomplete="family-name"></label>
+          <label class="full">Email<input id="email" name="email" type="email" autocomplete="email"></label>
+          <label>Phone<input id="phone" name="phone" type="tel" autocomplete="tel"></label>
+          <label>Location<input id="location" name="location" placeholder="City, State"></label>
+          <label class="full">Company<input id="company" name="company"></label>
+          <label class="full">LinkedIn<input id="linkedin" name="linkedin" type="url" placeholder="https://..."></label>
+          <label class="full">GitHub<input id="github" name="github" type="url" placeholder="https://..."></label>
+          <label class="full">Portfolio<input id="portfolio" name="portfolio" type="url" placeholder="https://..."></label>
+          <label>Years of experience<input id="yearsOfExperience" name="yearsOfExperience" type="number" min="0" step="1"></label>
+          <label>Authorized to work<select id="authorizedToWork" name="authorizedToWork"><option value="">Choose...</option><option value="Yes">Yes</option><option value="No">No</option></select></label>
+          <label>Requires sponsorship<select id="requiresSponsorship" name="requiresSponsorship"><option value="">Choose...</option><option value="Yes">Yes</option><option value="No">No</option></select></label>
+        </div>
 
-    <section class="documents">
-      <div class="section-title">Documents</div>
-      <div class="document-row">
-        <div><strong>Frontend CV</strong><span>Bundled PDF</span></div>
-        <button class="download" data-file="resume">Get</button>
-      </div>
-      <div class="document-row">
-        <div><strong>Cover Letter</strong><span>Bundled PDF</span></div>
-        <button class="download" data-file="cover">Get</button>
-      </div>
-      <div class="document-row">
-        <div><strong>Mindsize Cover</strong><span>Bundled PDF</span></div>
-        <button class="download" data-file="coverMindsize">Get</button>
-      </div>
-    </section>
+        <div class="actions">
+          <button id="saveButton" type="button" class="button secondary">Save</button>
+          <button id="fillButton" type="button" class="button primary">Fill Form</button>
+        </div>
 
-    <button id="editProfile" class="edit-button">⚙ Edit Profile</button>
+        <p id="status" class="status" role="status" aria-live="polite">Ready.</p>
+      </section>
+    </form>
 
-    <section id="profileEditor" class="profile-editor hidden">
-      <div class="section-title">Profile</div>
-      <div class="grid">
-        <label>First name<input id="firstName"></label>
-        <label>Last name<input id="lastName"></label>
-        <label class="full">Email<input id="email" type="email"></label>
-        <label>Phone<input id="phone"></label>
-        <label class="full">Location<input id="location"></label>
-        <label class="full">Company<input id="company"></label>
-        <label class="full">LinkedIn<input id="linkedin"></label>
-        <label class="full">GitHub<input id="github"></label>
-        <label class="full">Portfolio<input id="portfolio"></label>
-        <label>Authorized to work<input id="authorizedToWork"></label>
-        <label>Requires sponsorship<input id="requiresSponsorship"></label>
+    <section class="card ai-card">
+      <div>
+        <h2>Cover Letter</h2>
+        <p>AI generation will be connected later.</p>
       </div>
-      <button id="saveProfile" class="save-button">Save Profile</button>
+      <button id="coverLetterButton" type="button" class="button ghost">Generate with AI</button>
     </section>
 
     <footer>
-      <span>Review answers before submitting.</span>
+      <span>Review before submitting.</span>
       <a href="https://github.com/b-1-o/autofill" target="_blank" rel="noreferrer">GitHub</a>
     </footer>
   </main>
