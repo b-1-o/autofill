@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>b1o Autofill</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div>
+        <span class="eyebrow">JOB APPLICATION TOOL</span>
+        <h1>b1o Autofill</h1>
+      </div>
+      <span id="statusDot" class="status-dot" title="Extension status"></span>
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-title">Erik Ghabuzyan</div>
+      <div class="hero-subtitle">Frontend Developer · UI Engineer</div>
+      <div id="pageHint" class="muted">Ready to scan the current page.</div>
+    </section>
+
+    <section class="actions">
+      <button id="autofillBtn" class="primary">Autofill this page</button>
+      <button id="scanBtn" class="secondary">Scan fields</button>
+    </section>
+
+    <section class="result-card">
+      <div class="result-label">LAST ACTION</div>
+      <div id="resultText">No fields processed yet.</div>
+    </section>
+
+    <section class="documents">
+      <div class="section-heading">
+        <span>Documents</span>
+        <span class="muted">manual upload</span>
+      </div>
+      <div class="doc-row">
+        <div>
+          <strong>Frontend CV</strong>
+          <div class="muted small">Erik_Ghabuzyan_Frontend_Developer_CV.pdf</div>
+        </div>
+        <button class="mini" data-download="resume">Download</button>
+      </div>
+      <div class="doc-row">
+        <div>
+          <strong>General cover letter</strong>
+          <div class="muted small">Erik_Ghabuzyan_Cover_Letter.pdf</div>
+        </div>
+        <button class="mini" data-download="cover">Download</button>
+      </div>
+      <div class="doc-row">
+        <div>
+          <strong>Mindsize cover letter</strong>
+          <div class="muted small">Erik_Ghabuzyan_Cover_Letter_Mindsize.pdf</div>
+        </div>
+        <button class="mini" data-download="coverMindsize">Download</button>
+      </div>
+    </section>
+
+    <section class="toggle-card">
+      <div>
+        <strong>Include sensitive EEO fields</strong>
+        <div class="muted small">Off by default. Review every answer before submitting.</div>
+      </div>
+      <label class="switch">
+        <input id="sensitiveToggle" type="checkbox">
+        <span></span>
+      </label>
+    </section>
+
+    <section class="profile">
+      <div class="section-heading">
+        <span>Profile</span>
+        <button id="saveBtn" class="text-btn">Save</button>
+      </div>
+
+      <div class="grid">
+        <label>First name<input id="firstName" autocomplete="given-name"></label>
+        <label>Last name<input id="lastName" autocomplete="family-name"></label>
+        <label class="full">Email<input id="email" type="email" autocomplete="email"></label>
+        <label>Phone<input id="phone" autocomplete="tel"></label>
+        <label class="full">Address<input id="address" autocomplete="street-address"></label>
+        <label>City<input id="city" autocomplete="address-level2"></label>
+        <label>State<input id="state" autocomplete="address-level1"></label>
+        <label>ZIP<input id="zip" autocomplete="postal-code"></label>
+        <label class="full">LinkedIn<input id="linkedin"></label>
+        <label class="full">GitHub<input id="github"></label>
+        <label class="full">Portfolio<input id="portfolio"></label>
+        <label class="full">Professional title<input id="jobTitle"></label>
+      </div>
+    </section>
+
+    <footer>
+      <span>Review-first · no auto-submit</span>
+      <a href="https://github.com/b-1-o/autofill" target="_blank" rel="noreferrer">GitHub</a>
+    </footer>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>
