@@ -1,6 +1,11 @@
-// Injected into every frame by popup.js.
-// No personal profile data is passed through this script.
+(() => {
+  if (
+    typeof globalThis.__B1O_FILL_FROM_STORAGE__ ===
+    "function"
+  ) {
+    return globalThis
+      .__B1O_FILL_FROM_STORAGE__();
+  }
 
-if (window.top !== window.self) {
-  document.dispatchEvent(new Event("B1O_AUTOFILL_REQUEST"));
-}
+  return null;
+})();
