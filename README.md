@@ -103,30 +103,6 @@ The optional cover-letter action is different: when the user clicks Generate Cov
 
 Do not store passwords, API keys, session tokens, or other secrets in extension storage.
 
-## AI endpoint
-
-The repository includes api/generate.js.
-
-Request:
-
-~~~json
-{
-  "question": "Write a concise, truthful cover letter for this job.",
-  "jobDescription": "...",
-  "profile": {}
-}
-~~~
-
-Response:
-
-~~~json
-{
-  "answer": "AI endpoint placeholder. Connect OpenAI API here."
-}
-~~~
-
-The current function is intentionally a stub. The real OpenAI request belongs inside the Vercel function so the API key stays server-side.
-
 ### Local endpoint
 
 Run the Vercel function locally, then the extension uses:
@@ -140,12 +116,6 @@ http://localhost:3000/api/generate
 Set DEPLOYED_VERCEL_URL in popup/popup.js to the deployed Vercel project URL, without a trailing slash. Then update host_permissions in manifest.json to that exact hostname before publishing.
 
 Browser extension popup code cannot read Vercel's server-side process.env.VERCEL_URL directly, so the project uses an explicit deployment URL constant plus a localhost fallback instead.
-
-## Assets
-
-- assets/demo.gif — short product demo
-- assets/popup.png — popup screenshot
-- assets/README.md — recording instructions
 
 ## License
 
