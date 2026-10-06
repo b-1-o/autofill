@@ -5,12 +5,18 @@ A lightweight Manifest V3 browser extension for speeding up job applications wit
 ## What it does
 
 - Prefills common application fields from a local profile.
-- Uses semantic signals from labels, placeholders, `name`, `id`, `aria-label`, and `autocomplete`.
-- Works across common ATS-style forms without depending on a single vendor.
+- Detects fields through labels, placeholders, `name`, `id`, `aria-label`, `autocomplete`, and nearby form text.
+- Covers contact fields plus professional fields such as company, role, skills, summary, and experience description.
 - Includes your CV and cover letters from `assets/`.
 - Adds a small helper next to detected resume / cover-letter file inputs so the correct PDF can be downloaded quickly.
-- Keeps sensitive EEO autofill disabled by default.
+- Keeps optional EEO autofill disabled by default.
 - Never clicks a job site's final Submit button.
+
+## Privacy
+
+Because this repository is public, personal contact details and EEO values are **not hard-coded into the GitHub source**. Enter them once in the extension popup and they are stored with `chrome.storage.local` on your browser.
+
+The repository does not include an external backend, analytics endpoint, or profile-sync service.
 
 ## Included documents
 
@@ -26,27 +32,26 @@ A lightweight Manifest V3 browser extension for speeding up job applications wit
 3. Choose **Load unpacked**.
 4. Select the repository folder.
 5. Pin **b1o Autofill**.
+6. Enter your contact information once and click **Save locally**.
 
 ## Recommended flow
 
 1. Open a job application.
 2. Click the extension.
-3. Click **Scan fields** to see how much of the form is recognized.
+3. Click **Scan fields**.
 4. Click **Autofill this page**.
-5. Upload the downloaded CV / cover letter when the site requires a file.
-6. Review every answer, especially legal / demographic questions.
+5. Download the appropriate CV / cover letter and upload it when the site requires a file.
+6. Review every answer.
 7. Submit manually.
 
-## Important limitations
+## Why uploads stay manual
 
-Browsers intentionally protect local file inputs. An extension can download a bundled PDF for you, but it should not silently inject a local file into an employer's file picker. This extension therefore keeps document upload as a visible user action.
+Browsers protect local file inputs. An extension can download a bundled PDF quickly, but it should not silently inject a local file into an employer's file picker. This project therefore keeps document upload visible and user-controlled.
 
-Some ATS forms are built with custom components or cross-origin iframes and may expose little information to content scripts. The extension skips fields it cannot identify rather than guessing.
+## Limitations
 
-## Profile storage
-
-The profile is stored with `chrome.storage.local` on the browser where the extension is installed. No external server or analytics endpoint is included in this project.
+Custom React/Vue controls, cross-origin embedded frames, CAPTCHA flows, and vendor-specific widgets may require manual entry. The extension skips fields it cannot identify rather than guessing.
 
 ## Development
 
-This repository has no build step. Edit the JS/CSS/HTML directly, then reload the unpacked extension from the extensions page.
+There is no build step. Edit the JS/CSS/HTML directly, then reload the unpacked extension from the extensions page.
