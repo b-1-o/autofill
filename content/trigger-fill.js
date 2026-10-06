@@ -1,11 +1,19 @@
 (() => {
+  // The popup handles the main frame with tabs.sendMessage().
+  // This file is injected into all frames and only fills embedded frames.
   if (
-    typeof globalThis.__B1O_FILL_FROM_STORAGE__ ===
-    "function"
+    window.top === window.self
   ) {
-    return globalThis
-      .__B1O_FILL_FROM_STORAGE__();
+    return null;
   }
 
-  return null;
+  if (
+    typeof globalThis.__B1O_FILL_FROM_STORAGE__ !==
+    "function"
+  ) {
+    return null;
+  }
+
+  return globalThis
+    .__B1O_FILL_FROM_STORAGE__();
 })();
