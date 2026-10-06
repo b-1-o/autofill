@@ -28,9 +28,7 @@ function renderProfile(profile) {
   $("profileEmail").textContent =
     profile.email || "Add your details in Edit Profile";
 
-  for (const id of INPUTS) {
-    $(id).value = profile[id] || "";
-  }
+  for (const id of INPUTS) $(id).value = profile[id] || "";
 }
 
 function setStatus(message) {
@@ -60,20 +58,9 @@ async function fillCurrentTab() {
   try {
     const profile = await getProfile();
 
-    // The content script normally comes from manifest.json.
-    // This runtime injection is a fallback for pages where it was not ready.
-    try {
-      await chrome.tabs.sendMessage(tab.id, { action: "ping" });
-    } catch {
-      await chrome.scripting.executeScript({
-        target: { tabId: tab.id, allFrames: true },
-        files: ["content/content.js"]
-      });
-      await new Promise((resolve) => setTimeout(resolve, 80));
-    }
-
-    const response = await chrome.tabs.sendMessage(tab.id, {
+    const response = await chrome.runtime.sendMessage({
       action: "fill",
+      tabId: tab.id,
       profile
     });
 
