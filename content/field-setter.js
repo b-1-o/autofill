@@ -1,4 +1,17 @@
 (() => {
+  function dispatchEvents(
+    el,
+    events = ["input", "change", "blur"]
+  ) {
+    for (const type of events) {
+      el.dispatchEvent(
+        new Event(type, {
+          bubbles: true
+        })
+      );
+    }
+  }
+
   function setNativeValue(el, value) {
     const proto =
       el instanceof HTMLTextAreaElement
@@ -22,23 +35,11 @@
       value
     );
 
-    el.dispatchEvent(
-      new Event("input", {
-        bubbles: true
-      })
-    );
-
-    el.dispatchEvent(
-      new Event("change", {
-        bubbles: true
-      })
-    );
-
-    el.dispatchEvent(
-      new Event("blur", {
-        bubbles: true
-      })
-    );
+    dispatchEvents(el, [
+      "input",
+      "change",
+      "blur"
+    ]);
   }
 
   function normalize(value) {
@@ -57,45 +58,37 @@
       return false;
     }
 
-    const options = [
-      ...el.options
-    ];
+    const options = [...el.options];
 
     const exactIndex =
-      options.findIndex(
-        (option) => {
-          const text = normalize(
-            option.textContent
-          );
+      options.findIndex((option) => {
+        const text =
+          normalize(option.textContent);
 
-          const optionValue =
-            normalize(option.value);
+        const optionValue =
+          normalize(option.value);
 
-          return (
-            text === target ||
-            optionValue === target
-          );
-        }
-      );
+        return (
+          text === target ||
+          optionValue === target
+        );
+      });
 
     const fuzzyIndex =
-      options.findIndex(
-        (option) => {
-          const text = normalize(
-            option.textContent
-          );
+      options.findIndex((option) => {
+        const text =
+          normalize(option.textContent);
 
-          const optionValue =
-            normalize(option.value);
+        const optionValue =
+          normalize(option.value);
 
-          return (
-            text.includes(target) ||
-            target.includes(text) ||
-            optionValue.includes(target) ||
-            target.includes(optionValue)
-          );
-        }
-      );
+        return (
+          text.includes(target) ||
+          target.includes(text) ||
+          optionValue.includes(target) ||
+          target.includes(optionValue)
+        );
+      });
 
     const index =
       exactIndex >= 0
@@ -121,17 +114,10 @@
 
     el.selectedIndex = index;
 
-    el.dispatchEvent(
-      new Event("input", {
-        bubbles: true
-      })
-    );
-
-    el.dispatchEvent(
-      new Event("change", {
-        bubbles: true
-      })
-    );
+    dispatchEvents(el, [
+      "input",
+      "change"
+    ]);
 
     return true;
   }
@@ -139,9 +125,7 @@
   function getChoiceText(input) {
     const values = [
       input.value,
-      input.getAttribute(
-        "aria-label"
-      )
+      input.getAttribute("aria-label")
     ];
 
     if (input.id) {
@@ -210,35 +194,29 @@
     }
 
     const match =
-      group.find(
-        (input) => {
-          const text =
-            getChoiceText(input);
+      group.find((input) => {
+        const text =
+          getChoiceText(input);
 
-          if (
-            target === "yes"
-          ) {
-            return (
-              text === "yes" ||
-              text.startsWith("yes ")
-            );
-          }
-
-          if (
-            target === "no"
-          ) {
-            return (
-              text === "no" ||
-              text.startsWith("no ")
-            );
-          }
-
+        if (target === "yes") {
           return (
-            text === target ||
-            text.includes(target)
+            text === "yes" ||
+            text.startsWith("yes ")
           );
         }
-      );
+
+        if (target === "no") {
+          return (
+            text === "no" ||
+            text.startsWith("no ")
+          );
+        }
+
+        return (
+          text === target ||
+          text.includes(target)
+        );
+      });
 
     if (!match) {
       return false;
@@ -253,6 +231,7 @@
     Object.freeze({
       setNativeValue,
       setSelect,
-      setRadioOrCheckbox
+      setRadioOrCheckbox,
+      dispatchEvents
     });
 })();
