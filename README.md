@@ -18,7 +18,7 @@ Replace the target with measured results after real testing.
 ## Features
 
 - Profile stored locally via chrome.storage.sync
-- One-click fill on application forms
+- One-click fill on application forms from the popup or the floating Fill with Autofill action
 - React-controlled input handling (native setter + event dispatch)
 - Dynamic form support via MutationObserver
 - iframe support for embedded application forms
@@ -37,6 +37,8 @@ The normal autofill path does not require a backend. The optional cover-letter a
 JavaScript · Chrome Extension API (Manifest V3) · chrome.storage.sync · MutationObserver · Vercel Serverless
 
 ## Installation
+
+JoBrain integration: [https://jobrain.vercel.app/](https://jobrain.vercel.app/)
 
 1. Clone this repo
 2. Open chrome://extensions
