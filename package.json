@@ -1,6 +1,6 @@
 {
   "name": "autofill-extension",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "Chrome extension and Vercel stub API for job application autofill.",
   "engines": {
